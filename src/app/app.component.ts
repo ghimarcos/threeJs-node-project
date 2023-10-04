@@ -127,10 +127,35 @@ export class AppComponent implements OnInit, OnDestroy {
 
         this.scene?.add(this.copo);
 
+        this.alterarTexturaObjeto();
+
         // if (this.camera) {
         //   this.camera.position.z = 5;
         // }
       });
+    });
+  }
+
+  alterarTexturaObjeto() {
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.load('assets/imagens/img.png', (texture) => {
+      texture.needsUpdate = true;
+      // Crie um material com a textura
+      const material = new THREE.MeshBasicMaterial({ map: texture });
+
+      if (this.copo) {
+        // Acesse a malha (Mesh) dentro do objeto copo (se o copo tiver apenas uma malha)
+        const copoMesh = this.copo!.children[0] as THREE.Mesh;
+
+        // Atribua o novo material à malha
+        copoMesh.material = material;
+
+        // Renderize a cena novamente para ver as mudanças
+        if (this.renderer) {
+          this.renderer.render(this.scene!, this.camera!);
+        }
+      }
+
     });
   }
 
