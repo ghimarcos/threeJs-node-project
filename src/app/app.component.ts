@@ -20,7 +20,7 @@ export class AppComponent implements OnInit, OnDestroy {
   controls?: OrbitControls;
   objLoader = new OBJLoader();
   mtlLoader = new MTLLoader();
-
+  copo: THREE.Object3D | undefined;
   constructor(private ngZone: NgZone) { }
 
   ngOnInit() {
@@ -50,6 +50,9 @@ export class AppComponent implements OnInit, OnDestroy {
     // render.setSize estou determinando o tamanho da tela para mostrar a cena
     this.renderer.setSize(window.innerWidth - 50, window.innerHeight - 30);
 
+    // Defina a cor de fundo para preto
+    this.renderer.setClearColor(0x00000033); // 0x000000 representa a cor preta em hexadecimal
+
     this.rendererContainer?.nativeElement.appendChild(this.renderer.domElement);
 
     // cria os controles para mover o objeto com o mouse
@@ -59,11 +62,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.createLights();
   }
 
-  createLights() {
-    const light = new THREE.PointLight(0xFFFFF, 1.4, 1000);
-    light.position.set(2, 3, 2);
-    this.scene?.add(light);
-  }
+
 
   createControl() {
     // Crie uma instância de OrbitControls
@@ -94,27 +93,43 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
+  createLights() {
+    const light1 = new THREE.PointLight(0xFFFFF, 1.4, 1000);
+    light1.position.set(-3, 3, -5);
+    this.scene?.add(light1);
+
+    const light2 = new THREE.PointLight(0xFFFFF, 1.4, 1000);
+    light2.position.set(1, 3, 5);
+    this.scene?.add(light2);
+
+    const light3 = new THREE.PointLight(0xFFFFF, 1.4, 1000);
+    light3.position.set(-11, 3, -5);
+    this.scene?.add(light3);
+  }
+
   createObj() {
     // Carregue o arquivo MTL (material) primeiro
-    this.mtlLoader.load('assets/objects-vectary/Teste Project.mtl', (materials) => {
+    this.mtlLoader.load('assets/objects-vectary/Copo.mtl', (materials) => {
       materials.preload();
 
       // Após carregar o MTL, configure os materiais para o OBJLoader
       this.objLoader.setMaterials(materials);
 
       // Em seguida, carregue o arquivo OBJ e associe os materiais carregados
-      this.objLoader.load('assets/objects-vectary/Teste Project.obj', (object) => {
+      this.objLoader.load('assets/objects-vectary/Copo.obj', (object) => {
         // Adicione o objeto à cena e faça outras configurações
-        this.scene?.add(object);
 
-        object.position.z -= 1;
-        object.position.x = 0;
+        this.copo = object;
+        // this.copo.position.z -= 6;
+        // this.copo.position.x = 2;
 
-        object.scale.set(0.1, 0.1, 0.1); // Isso reduzirá o objeto para metade do tamanho
+        this.copo.scale.set(0.05, 0.05, 0.05); // Isso reduzirá o objeto para metade do tamanho
 
-        if (this.camera) {
-          this.camera.position.z = 5;
-        }
+        this.scene?.add(this.copo);
+
+        // if (this.camera) {
+        //   this.camera.position.z = 5;
+        // }
       });
     });
   }
@@ -136,15 +151,15 @@ export class AppComponent implements OnInit, OnDestroy {
       requestAnimationFrame(this.animate);
     });
 
-    // if (this.cube) {
-    // Atualize os controles
-    this.controls?.update();
+    if (this.copo) {
+      // Atualize os controles
+      this.controls?.update();
 
-    // this.cube.rotation.x += 0.01;
-    // this.cube.rotation.y += 0.01;
+      // this.copo!.rotation.x += 0.01;
+      // this.copo!.rotation.y += 0.01;
 
-    this.renderer?.render(this.scene!, this.camera!);
-    // }
+      this.renderer?.render(this.scene!, this.camera!);
+    }
 
   }
 }
